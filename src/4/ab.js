@@ -1,8 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 
-
-
 const sumRealRoomSectorIds = (inputPath) => {
   const data = fs.readFileSync(inputPath, 'utf8');
   const dataArr = data.split('\n');
@@ -72,6 +70,42 @@ const sumRealRoomSectorIds = (inputPath) => {
   return sum;
 };
 
+const findRoomName = (inputPath) => {
+  const data = fs.readFileSync(inputPath, 'utf8');
+  const dataArr = data.split('\n');
 
-const results = sumRealRoomSectorIds(path.resolve(__dirname, 'input.txt'));
-console.log(results);
+  return dataArr.map((item)=>{
+    let code = item.slice(0, item.length-11).split('-').join(' ');
+    const sectorId = parseInt(item.slice(item.length-10, item.length-7));
+    let newCode = [];
+    for(let char in code){
+      const charCode = code[char].charCodeAt(0);
+      let newCharCode = charCode;
+      if( charCode === 32) {
+        newCharCode = 32;
+      } else {
+        for(let i=0; i < sectorId; i++){
+          if(newCharCode < 122){
+            newCharCode++;
+          } else if (newCharCode === 122) {
+            newCharCode = 97;
+          }
+        }
+      }
+
+      newCode.push(String.fromCharCode(newCharCode));
+    }
+    return {
+      sectorId: sectorId,
+      code: newCode.join('')
+    };
+  }).filter((item)=>{
+    return item.code.indexOf('north') !== -1;
+  });
+}
+
+//const part1 = sumRealRoomSectorIds(path.resolve(__dirname, 'input.txt'));
+const part2 = findRoomName(path.resolve(__dirname, 'input.txt'));
+//console.log(part1);
+console.log(part2);
+
